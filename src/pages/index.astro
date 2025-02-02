@@ -1,11 +1,12 @@
 ---
-import Layout from '../layouts/Layout.astro'; // If using a layout
+import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout>
   <main>
     <h1>Welcome!</h1>
     <div id="visitor-info">Loading...</div>
+    <div id="map-link" style="display:none;"></div>  </main>
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {
@@ -19,6 +20,7 @@ import Layout from '../layouts/Layout.astro'; // If using a layout
                   (position) => {
                     const latitude = position.coords.latitude;
                     const longitude = position.coords.longitude;
+
                     fetch(`https://geocode.maps.co/reverse?lat=${latitude}&lon=${longitude}`)
                       .then(response => response.json())
                       .then(locationData => {
@@ -29,6 +31,12 @@ import Layout from '../layouts/Layout.astro'; // If using a layout
                           locationString += `Latitude: ${latitude}, Longitude: ${longitude}`;
                         }
                         document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, ${locationString}`;
+
+                        // Create Google Maps link
+                        const mapLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                        const mapLinkElement = document.getElementById('map-link');
+                        mapLinkElement.innerHTML = `<a href="${mapLink}" target="_blank">View on Google Maps</a>`;
+                        mapLinkElement.style.display = 'block'; // Show the link
                       })
                       .catch(error => {
                         document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, Location: Could not determine location. Error: ${error.message}`;
@@ -51,5 +59,4 @@ import Layout from '../layouts/Layout.astro'; // If using a layout
         getVisitorInfo();
       });
     </script>
-  </main>
 </Layout>

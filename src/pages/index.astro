@@ -1,21 +1,55 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import ContextAlert from '../components/ContextAlert.astro';
-import Markdown from '../components/Markdown.astro';
-
-const explainer = `
-An Astro website can go way beyond static pages - on the right platform.
-
-Netlifyx supports not only [Streaming SSR](https://docs.astro.build/en/guides/server-side-rendering/#html-streaming) and fast [Edge Middleware](https://docs.astro.build/en/guides/middleware/), but also [on-demand revalidation](https://www.netlify.com/blog/cache-tags-and-purge-api-on-netlify/) and [stale-while-revalidate](https://www.netlify.com/blog/swr-and-fine-grained-cache-control/). 
-Any page or data can be rebuilt only when needed, without site visitors ever getting a performance hit.
-`;
+import Layout from '../layouts/Layout.astro'; // If using a layout
 ---
-<script>alert(1)</script>
-<Layout title="Welcome to Astro.">
-    <ContextAlert class="mb-4" />
-    <h1 class="mb-10">Netlify Platform Starter for Astro</h1>
-    <Markdown content={explainer} class="text-lg mb-10" />
-    <p class="mb-8">
-        <a href="https://docs.netlify.com/frameworks/astro/" class="btn btn-lg btn-primary sm:btn-wide">Read the Docs</a>
-    </p>
+
+<Layout>
+  <main>
+    <h1>Welcome!</h1>
+    <div id="visitor-info">Loading...</div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        function getVisitorInfo() {
+          fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+              const ipAddress = data.ip;
+              if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    fetch(`https://geocode.maps.co/reverse?lat=${latitude}&lon=${longitude}`)
+                      .then(response => response.json())
+                      .then(locationData => {
+                        let locationString = "Location: ";
+                        if (locationData.display_name) {
+                          locationString += locationData.display_name;
+                        } else {
+                          locationString += `Latitude: ${latitude}, Longitude: ${longitude}`;
+                        }
+                        document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, ${locationString}`;
+                      })
+                      .catch(error => {
+                        document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, Location: Could not determine location. Error: ${error.message}`;
+                      });
+                  },
+                  (error) => {
+                    document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, Location: Could not determine location. Error: ${error.message}`;
+                  },
+                  { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
+              } else {
+                document.getElementById('visitor-info').textContent = "IP Address: " + ipAddress + "\nGeolocation is not supported by this browser.";
+              }
+            })
+            .catch(error => {
+              document.getElementById('visitor-info').textContent = "Could not get IP address. Error: " + error;
+            });
+        }
+
+        getVisitorInfo();
+      });
+    </script>
+  </main>
 </Layout>

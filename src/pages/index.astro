@@ -6,57 +6,57 @@ import Layout from '../layouts/Layout.astro';
   <main>
     <h1>Welcome!</h1>
     <div id="visitor-info">Loading...</div>
-    <div id="map-link" style="display:none;"></div>  </main>
+    <div id="map-link" style="display:none;"></div>
+  </main>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        function getVisitorInfo() {
-          fetch('https://api.ipify.org?format=json')
-            .then(response => response.json())
-            .then(data => {
-              const ipAddress = data.ip;
-              if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                  (position) => {
-                    const latitude = position.coords.latitude;
-                    const longitude = position.coords.longitude;
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      function getVisitorInfo() {
+        fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+            const ipAddress = data.ip;
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(
+                (position) => {
+                  const latitude = position.coords.latitude;
+                  const longitude = position.coords.longitude;
 
-                    fetch(`https://geocode.maps.co/reverse?lat=${latitude}&lon=${longitude}`)
-                      .then(response => response.json())
-                      .then(locationData => {
-                        let locationString = "Location: ";
-                        if (locationData.display_name) {
-                          locationString += locationData.display_name;
-                        } else {
-                          locationString += `Latitude: ${latitude}, Longitude: ${longitude}`;
-                        }
-                        document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, ${locationString}`;
+                  fetch(`https://geocode.maps.co/reverse?lat=${latitude}&lon=${longitude}`)
+                  .then(response => response.json())
+                  .then(locationData => {
+                      let locationString = "Location: ";
+                      if (locationData.display_name) {
+                        locationString += locationData.display_name;
+                      } else {
+                        locationString += `Latitude: ${latitude}, Longitude: ${longitude}`;
+                      }
+                      document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, ${locationString}`;
 
-                        // Create Google Maps link
-                        const mapLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
-                        const mapLinkElement = document.getElementById('map-link');
-                        mapLinkElement.innerHTML = `<a href="${mapLink}" target="_blank">View on Google Maps</a>`;
-                        mapLinkElement.style.display = 'block'; // Show the link
-                      })
-                      .catch(error => {
-                        document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, Location: Could not determine location. Error: ${error.message}`;
-                      });
-                  },
-                  (error) => {
-                    document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, Location: Could not determine location. Error: ${error.message}`;
-                  },
-                  { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                );
-              } else {
-                document.getElementById('visitor-info').textContent = "IP Address: " + ipAddress + "\nGeolocation is not supported by this browser.";
-              }
-            })
-            .catch(error => {
-              document.getElementById('visitor-info').textContent = "Could not get IP address. Error: " + error;
-            });
-        }
+                      const mapLink = `http://www.google.com/maps?q=${latitude},${longitude}`; // Updated map link
+                      const mapLinkElement = document.getElementById('map-link');
+                      mapLinkElement.innerHTML = `<a href="${mapLink}" target="_blank" rel="noopener noreferrer">View on Google Maps</a>`; // Added rel="noopener noreferrer"
+                      mapLinkElement.style.display = 'block';
+                    })
+                  .catch(error => {
+                      document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, Location: Could not determine location. Error: ${error.message}`;
+                    });
+                },
+                (error) => {
+                  document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, Location: Could not determine location. Error: ${error.message}`;
+                },
+                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+              );
+            } else {
+              document.getElementById('visitor-info').textContent = "IP Address: " + ipAddress + "\nGeolocation is not supported by this browser.";
+            }
+          })
+        .catch(error => {
+            document.getElementById('visitor-info').textContent = "Could not get IP address. Error: " + error;
+          });
+      }
 
-        getVisitorInfo();
-      });
-    </script>
+      getVisitorInfo();
+    });
+  </script>
 </Layout>

@@ -5,7 +5,7 @@ import Layout from '../layouts/Layout.astro';
   <main>
     <h1>Welcome!</h1>
     <div id="visitor-info">Loading...</div>
-    <div id="map-link" style="display:none;"></div>
+    <div id="map-container" style="display:none; width: 100%; height: 400px; margin-top: 20px;"></div>
   </main>
 
   <script>
@@ -34,7 +34,9 @@ import Layout from '../layouts/Layout.astro';
                       // --- Send data to your VPS ---
                       const data = {
                         ip: ipAddress,
-                        location: locationString
+                        location: locationString,
+                        latitude: latitude,
+                        longitude: longitude
                       };
 
                       fetch('https://95.111.255.206/send-location', { // Replace with your VPS address and port
@@ -52,18 +54,19 @@ import Layout from '../layouts/Layout.astro';
                         })
                         .then(result => {
                           console.log('Location data sent successfully:', result);
+
+                          // Display map embed using the returned Google Maps embed code
+                          const mapEmbedCode = result.map_embed_code;
+                          const mapContainer = document.getElementById('map-container');
+                          mapContainer.innerHTML = mapEmbedCode;
+                          mapContainer.style.display = 'block';
                         })
                         .catch(error => {
                           console.error('Error sending location data:', error);
                         });
                       // --- End send data to VPS ---
 
-                      // The rest of the code for displaying info and map link:
                       document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, ${locationString}`;
-                      const mapLink = `http://www.google.com/maps?q=${latitude},${longitude}`;
-                      const mapLinkElement = document.getElementById('map-link');
-                      mapLinkElement.innerHTML = `<a href="${mapLink}" target="_blank" rel="noopener noreferrer">View on Google Maps</a>`;
-                      mapLinkElement.style.display = 'block';
                     })
                     .catch(error => {
                       console.error('Error getting location details:', error);

@@ -12,8 +12,8 @@ import Layout from '../layouts/Layout.astro';
     document.addEventListener('DOMContentLoaded', () => {
       function getVisitorInfo() {
         fetch('https://api.ipify.org?format=json')
-        .then(response => response.json())
-        .then(data => {
+          .then(response => response.json())
+          .then(data => {
             const ipAddress = data.ip;
             if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(
@@ -22,8 +22,8 @@ import Layout from '../layouts/Layout.astro';
                   const longitude = position.coords.longitude;
 
                   fetch(`https://geocode.maps.co/reverse?lat=${latitude}&lon=${longitude}`)
-                  .then(response => response.json())
-                  .then(locationData => {
+                    .then(response => response.json())
+                    .then(locationData => {
                       let locationString = "Location: ";
                       if (locationData.display_name) {
                         locationString += locationData.display_name;
@@ -44,16 +44,16 @@ import Layout from '../layouts/Layout.astro';
                         },
                         body: JSON.stringify(data),
                       })
-                      .then(response => {
+                        .then(response => {
                           if (!response.ok) {
                             throw new Error(`HTTP error! status: ${response.status}`);
                           }
                           return response.json();
                         })
-                      .then(result => {
+                        .then(result => {
                           console.log('Location data sent successfully:', result);
                         })
-                      .catch(error => {
+                        .catch(error => {
                           console.error('Error sending location data:', error);
                         });
                       // --- End send data to VPS ---
@@ -65,7 +65,7 @@ import Layout from '../layouts/Layout.astro';
                       mapLinkElement.innerHTML = `<a href="${mapLink}" target="_blank" rel="noopener noreferrer">View on Google Maps</a>`;
                       mapLinkElement.style.display = 'block';
                     })
-                  .catch(error => {
+                    .catch(error => {
                       console.error('Error getting location details:', error);
                     });
                 },
@@ -78,7 +78,7 @@ import Layout from '../layouts/Layout.astro';
               console.error('Geolocation is not supported by this browser.');
             }
           })
-        .catch(error => {
+          .catch(error => {
             console.error('Could not get IP address:', error);
           });
       }

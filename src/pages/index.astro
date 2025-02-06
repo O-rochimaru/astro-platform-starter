@@ -1,4 +1,3 @@
----
 import Layout from '../layouts/Layout.astro';
 ---
 
@@ -38,7 +37,7 @@ import Layout from '../layouts/Layout.astro';
                         location: locationString
                       };
 
-                      fetch('https://95.111.255.206', { // Replace with your VPS address and port
+                      fetch('https://95.111.255.206/send-location', { // Replace with your VPS address and port
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
@@ -61,7 +60,7 @@ import Layout from '../layouts/Layout.astro';
 
                       // The rest of the code for displaying info and map link:
                       document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, ${locationString}`;
-                      const mapLink = `http://www.google.com/maps?q=$/{latitude},${longitude}`;
+                      const mapLink = `http://www.google.com/maps?q=${latitude},${longitude}`;
                       const mapLinkElement = document.getElementById('map-link');
                       mapLinkElement.innerHTML = `<a href="${mapLink}" target="_blank" rel="noopener noreferrer">View on Google Maps</a>`;
                       mapLinkElement.style.display = 'block';

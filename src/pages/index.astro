@@ -47,4 +47,24 @@ import Layout from '../layouts/Layout.astro';
               if (!response.ok) throw new Error(`Server error: ${response.status}`);
               const result = await response.json();
 
-              document.getElementById('visitor-info').text
+              document.getElementById('visitor-info').textContent = `IP: ${ipAddress}, Latitude: ${latitude}, Longitude: ${longitude}`;
+              console.log('Location sent:', result);
+            } catch (error) {
+              console.error('Error processing location:', error);
+            }
+          },
+          (error) => {
+            if (error.code === error.PERMISSION_DENIED) {
+              document.getElementById('visitor-info').textContent = "Location access denied. Please enable it in settings.";
+            } else {
+              console.error("Geolocation error:", error);
+            }
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+      }
+
+      document.getElementById('get-location').addEventListener('click', getVisitorInfo);
+    });
+  </script>
+</Layout>
